@@ -18,11 +18,11 @@ Estructura
 Ejecutar
 --------
 
-java -jar readcdb.jar <url> <ruta de descarga de ficheros>
+java -jar urlreader.jar <url> <ruta de descarga de ficheros>
 
 p.e.
 
-java -jar readcdb.jar http://www.aecoc.es c:\\datos\\
+java -jar urlreader.jar http://www.aecoc.es c:\\datos\\
 
 
 
