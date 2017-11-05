@@ -20,8 +20,8 @@ import javax.activation.MimetypesFileTypeMap;
 
 public class URLReader {
     public static void main(String[] args) throws Exception {
-        String szUrl = "https://www.aecoc.es";
-        String szPath = "c:\\datos\\";
+        String szUrl = args[0];
+        String szPath = args[1];
 
         Long iProject = insertProject(szUrl);
 
@@ -40,19 +40,28 @@ public class URLReader {
             iSite = insertSite(piProject, pszUrl);
             for (Element src : media) {
                 Long iContent = getContent(piProject, iSite, src.attr("abs:src"));
-                if (iContent == 0) {
-                    iContent = insertContent(piProject, iSite, src.attr("abs:src"), src.tagName());
+                if (!getFileNameFromUrl(src.attr("abs:src")).equals(null) && !getFileNameFromUrl(src.attr("abs:src")).equals("")) {
+                    if (getTypeSelect(getFileNameFromUrl(src.attr("abs:src"))) == true ) {
+                        if (isFileExists(pszPath + getFileNameFromUrl(src.attr("abs:src"))) == 0)  {
+                            saveFile(src.attr("abs:src"), getFileNameFromUrl(src.attr("abs:src")), pszPath);
+                        }
+                        if (iContent == 0) {
+                            iContent = insertContent(piProject, iSite, src.attr("abs:src"), src.tagName());
+                        }
+                    }
                 }
             }
 
             for (Element link : imports) {
                 Long iContent = getContent(piProject, iSite, link.attr("abs:href"));
                 if (!getFileNameFromUrl(link.attr("abs:href")).equals(null) && !getFileNameFromUrl(link.attr("abs:href")).equals("")) {
-                    if (isFileExists(pszPath + getFileNameFromUrl(link.attr("abs:href"))) == 0)  {
-                        saveFile(link.attr("abs:href"), getFileNameFromUrl(link.attr("abs:href")), pszPath);
-                    }
-                    if (iContent == 0) {
-                        iContent = insertContent(piProject, iSite, link.attr("abs:href"), "Media");
+                    if (getTypeSelect(getFileNameFromUrl(link.attr("abs:href"))) == true ) {
+                        if (isFileExists(pszPath + getFileNameFromUrl(link.attr("abs:href"))) == 0)  {
+                            saveFile(link.attr("abs:href"), getFileNameFromUrl(link.attr("abs:href")), pszPath);
+                        }
+                        if (iContent == 0) {
+                            iContent = insertContent(piProject, iSite, link.attr("abs:href"), "Media");
+                        }
                     }
                 }
             }
@@ -74,6 +83,18 @@ public class URLReader {
        String returnvalue = "";
        MimetypesFileTypeMap mimeTypesMap = new MimetypesFileTypeMap(); 
        returnvalue = mimeTypesMap.getContentType(pszFile);
+       return returnvalue;
+       
+   }
+   
+   private static boolean getTypeSelect(String pszFile ) {
+       boolean returnvalue = false;
+       if (pszFile.substring(pszFile.lastIndexOf('.') + 1) == "pdf" ||
+           pszFile.substring(pszFile.lastIndexOf('.') + 1) == "jpg" ||
+           pszFile.substring(pszFile.lastIndexOf('.') + 1) == "png" ||
+           pszFile.substring(pszFile.lastIndexOf('.') + 1) == "jpeg") {
+           returnvalue = true;
+       }
        return returnvalue;
        
    }
